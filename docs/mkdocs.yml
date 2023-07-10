@@ -1,0 +1,32 @@
+site_name: Fluid
+repo_url: https://github.com/Lanred-Dev/Fluid
+repo_name: Lanred-Dev/Fluid
+theme:
+  name: material
+  language: en
+  features:
+    - toc.integrate
+    - navigation.top
+    - navigation.tabs
+    - navigation.sections
+    - search.suggest
+    - search.highlight
+    - content.tabs.link
+    - content.code.copy
+    - content.code.select
+    - content.code.annotation
+  icon:
+    repo: fontawesome/brands/github
+markdown_extensions:
+  - codehilite
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+extra:
+  social:
+    - icon: fontawesome/brands/github-alt
+      link: https://github.com/Lanred-Dev
+copyright: |
+  &copy; 2023 <a href="https://github.com/Lanred-Dev" target="_blank" rel="noopener">Lanred</a>
+extra_css:
+  - stylesheets/extra.css

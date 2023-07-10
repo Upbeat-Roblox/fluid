@@ -93,7 +93,7 @@ local component = {}
 --make the tween component public so that other scripts may access it
 component.tween = tween
 
-function component.new(targets: types.targets, info: types.info, properties: types.properties)
+function component.new(targets: types.targets, info: types.info, properties: types.properties): bareboneTween
 	assert(
 		(typeof(targets) == "Instance" or typeof(targets) == "table"),
 		messages.creation.invalidTargets,
@@ -134,7 +134,7 @@ function component.new(targets: types.targets, info: types.info, properties: typ
 		stateChanged = signal.new(),
 		update = signal.new(),
 		resumed = signal.new(),
-	}, tween)
+	}, tween) :: any
 end
 
 return component
