@@ -34,7 +34,7 @@
 
     /* code block color */
     --md-code-fg-color: var(--md-default-fg-color);
-    --md-code-bg-color: #050505;
+    --md-code-bg-color: #0c0e13;
 
     /* text color */
     --md-default-fg-color: #fff;
@@ -65,7 +65,7 @@
 }
 
 .md-header.md-header--shadow {
-    background-color: var(--md-primary-fg-color--light);
+    background-color: #3051a54f;
     backdrop-filter: saturate(200%) blur(15px);
 }
 
@@ -123,6 +123,7 @@
 }
 
 .md-typeset h1, .md-typeset h2 {
+    color: var(--md-default-fg-color);
     font-weight: 600;
 }
 
@@ -161,8 +162,8 @@
 .md-typeset .admonition {
     background-color: var(--md-footer-bg-color--dark);
     border-radius: 0.3rem;
-    border: 0px;
-    border-left: 6px solid #000;
+    border: 2px solid #000;
+    overflow: hidden;
 }
 
 .md-typeset .admonition .admonition-title {
@@ -170,9 +171,48 @@
 }
 
 .md-typeset .admonition.caution {
-    border-left-color: #ffd900;
+    border-color: #ffd900;
 }
 
 .md-typeset .admonition.caution .admonition-title {
     background-color: #ffd9000e;
+}
+
+.md-typeset .admonition.info {
+    border-color: var(--md-primary-fg-color);
+}
+
+.md-typeset .admonition.info .admonition-title {
+    background-color: var(--md-primary-fg-color--light);
+}
+
+/* fluid custom */
+.fluid-api-header, .fluid-api-header .fluid-header-icon, .fluid-api-header .fluid-header-pills {
+    display: flex;
+    align-items: center;
+}
+
+.fluid-api-header .fluid-header-title {
+    padding-left: .9375rem;
+    margin-right: auto;
+}
+
+.fluid-api-header .fluid-header-pills {
+    gap: .25rem;
+}
+
+.fluid-api-header .fluid-header-pills .fluid-header-pill {
+    padding: .4rem .625rem;
+    border-radius: 999999999999px;
+    background-color: #000;
+    font-size: medium;
+    font-weight: 500;
+}
+
+.fluid-api-header .fluid-header-pills .fluid-header-pill.private {
+    background-color: var(--md-primary-fg-color);
+}
+
+.fluid-api-header .fluid-header-pills .fluid-header-pill.type {
+    background-color: #AF25CE;
 }

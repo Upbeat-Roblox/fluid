@@ -1,26 +1,23 @@
---Lanred
---7/3/2023
+--[[
+	@title parser/value
+	@author Lanred
+	@version 1.0.0
+]]
 
---parses the value / target values for a tween
-
---//types
 local types = require(script.Parent.Parent.Parent.types)
+local messages = require(script.Parent.Parent.Parent.messages)
 
 type arrayTypes = "Array" | "Dictionary" | "Mixed" | "Empty"
 
---//dependencies
-local assert = require(script.Parent.Parent.Parent.dependencies.assert)
-
---//components
-local messages = require(script.Parent.Parent.Parent.messages)
-
---//core
---functions
-local function getPropertyForModel(model: Model, property: string): types.dataTypeNoFunction
+-- Gets a property value from a model.
+-- @param {Model} model [They model to get the value from.]
+-- @param {string} property [The property name.]
+-- @returns dataTypeNoFunction
+local function getPropertyValueFromModel(model: Model, property: string): types.dataTypeNoFunction
 	if property == "Position" or property == "CFrame" then
 		return model:GetPivot()
 	elseif property == "Color" or property == "Transparency" then
-		local startingValue: (Color3 | number)? = nil
+		local propertyValue: any = nil
 
 		for _, instance: Instance in ipairs(model:GetDescendants()) do
 			if instance:IsA("BasePart") == false then
@@ -29,31 +26,48 @@ local function getPropertyForModel(model: Model, property: string): types.dataTy
 
 			local value: Color3 | number = (instance :: any)[property]
 
-			if startingValue == nil then
-				startingValue = value
-			elseif value ~= startingValue then
+			-- In reality having not all BaseParts be the same
+			-- will not affect the tween but there would be no way
+			-- for the parser to get a certain starting value.
+			-- TODO: Find ways to improve this so that not all
+			-- BaseParts have to have the same value.
+			if propertyValue == nil then
+				propertyValue = value
+			elseif value ~= propertyValue then
 				error(messages.parser.modelPropertiesAreNotTheSame, 0)
 			end
 		end
 
-		--check to make sure a starting value was set. if it was not then no valid BaseParts where found
-		assert(startingValue, messages.parser.noValidModelBaseParts, model.Name)
+		-- If not starting value was set then that means that no valid
+		-- BaseParts where found.
+		if propertyValue == nil then
+			error(messages.parser.noValidModelBaseParts:format(model.Name), 0)
+		end
 
-		return startingValue :: any
+		return propertyValue :: any
 	else
 		error(messages.parser.invalidModelProperties:format(property), 0)
 	end
 end
 
---gets the property value based off the instance type
+-- Gets the property value from a instance. If the instance
+-- is a model then it will get use the `getPropertyValueFromModel` function.
+-- @param {targets} instance [The instance to get the value from.]
+-- @param {string} property [The property to get the value from.]
+-- @returns dataTypeNoFunction
 local function getPropertyValue(instance: types.targets, property: string): types.dataTypeNoFunction
 	if typeof(instance) == "Instance" and instance:IsA("Model") then
-		return getPropertyForModel(instance, property)
+		return getPropertyValueFromModel(instance, property)
 	else
 		return (instance :: any)[property]
 	end
 end
 
+-- Gets the start and target values from the passed array.
+-- @param {targets} instance [The instance.]
+-- @param {string} property [The property.]
+-- @param {{ dataTypeNoFunction }} value [The values.]
+-- @returns boolean, types.dataTypeNoFunction, types.dataTypeNoFunction
 local function getStartAndTargetFromValueArray(
 	instance: types.targets,
 	property: string,
@@ -63,13 +77,13 @@ local function getStartAndTargetFromValueArray(
 	local start: types.dataTypeNoFunction
 	local target: types.dataTypeNoFunction
 
-	--if its length is two or more then the first one is the start and the second is the target
 	if #value >= 2 then
 		startWasDefined = true
 		start = value[1]
 		target = value[2]
 	else
-		--the developer should try to provide two values but this is just incase they dont
+		-- Two values should be provided but incase they are
+		-- not just get a starting property.
 		start = getPropertyValue(instance, property)
 		target = value[1]
 	end
@@ -77,10 +91,12 @@ local function getStartAndTargetFromValueArray(
 	return startWasDefined, start, target
 end
 
---big thanks to XAXA from this DevForum post:
---https://devforum.roblox.com/t/detecting-type-of-table-empty-array-dictionary-mixedtable/292323/15
+-- @author XAXA
+-- @source https://devforum.roblox.com/t/detecting-type-of-table-empty-array-dictionary-mixedtable/292323/15
+-- @param {table} t [The table to type check.]
+-- @returns arrayTypes
 local function getTableType(t): arrayTypes
-	if next(t) == nil then
+	if typeof(t) ~= "table" or next(t) == nil then
 		return "Empty"
 	end
 	local isArray = true
@@ -101,7 +117,11 @@ local function getTableType(t): arrayTypes
 	end
 end
 
---main
+-- Gets the start and target property values for a property.
+-- @param {targets} instance [The instance to get the values from.]
+-- @param {string} property [The property to use for the values.]
+-- @param {propertyParameters} propertyParameters [The property parameters to use.]
+-- @returns dataTypeNoFunction, dataTypeNoFunction
 return function(
 	instance: types.targets,
 	property: string,
@@ -130,40 +150,34 @@ return function(
 			start = startValue
 			target = targetValue
 		else
-			--the value is the target, so get the starting based off of the instance property
 			start = getPropertyValue(instance, property)
 			target = propertyParameters.value
 		end
 
-		--do we need to add the values to the current target values?
+		-- Do the provided values need to be added to the property values?
 		if typeof(propertyParameters.addValue) == "boolean" and propertyParameters.addValue == true then
-			--we do so lets get the starting value and add to that
 			local startingValue: types.dataTypeNoFunction = getPropertyValue(instance, property)
-			--if the start was not defined then the start is whatever it is in the target already
 			finialStart = startWasDefined == true and (startingValue :: any) + start or start
 			finialTarget = (startingValue :: any) + target
 		elseif propertyParameters.addValue ~= nil then
-			--this reports to the developer that the add value is invalid
 			error(messages.parser.invalidAdd:format(typeof(propertyParameters.addValue)), 0)
 		else
-			--we dont so the start and target is the finial
 			finialStart = start
 			finialTarget = target
 		end
 	elseif propertyParametersTableType == "Array" then
-		--the property parameters are the start and target values
 		local _startWasDefinedValue, startValue, targetValue =
 			getStartAndTargetFromValueArray(instance, property, propertyParameters)
 		finialStart = startValue
 		finialTarget = targetValue
 	elseif propertyParametersTableType == "Empty" then
-		--the value is the target, so get the starting based off of the instance property
 		finialStart = getPropertyValue(instance, property)
 		finialTarget = propertyParameters :: any
 	else
 		error(messages.parser.invalidPropertyParameters, 0)
 	end
 
+	-- Confirm that they are of the same type.
 	if typeof(finialStart) ~= typeof(finialTarget) then
 		error(messages.parser.invalidTargetDataType:format(typeof(finialStart), typeof(finialTarget)), 0)
 	end

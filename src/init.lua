@@ -1,17 +1,26 @@
---Lanred
---6/27/2023
+--[[
+  _____   _           _       _ 
+ |  ___| | |  _   _  (_)   __| |
+ | |_    | | | | | | | |  / _` |
+ |  _|   | | | |_| | | | | (_| |
+ |_|     |_|  \__,_| |_|  \__,_|
 
---//roblox services
+ Devforum Post:
+ Github: https://github.com/Lanred-Dev/Fluid
+ Documentation: https://lanred-dev.github.io/Fluid
+]]
+
+--[[
+	@title fluid
+	@author Lanred
+	@version 1.0.0
+]]
+
 local RunService = game:GetService("RunService")
 
---//core
---variables
 local isClient: boolean = RunService:IsClient()
-
---main
 local environment
 
---run the correct environment
 if isClient == true then
 	environment = require(script.environments.client)
 else

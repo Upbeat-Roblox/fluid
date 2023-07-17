@@ -1,25 +1,30 @@
---Lanred
---6/27/2023
+--[[
+	@title environments/client
+	@author Lanred
+	@version 1.0.0
+]]
 
---TODO: when getting request from server to play tween, if it has already started, to calc to find current point
-
---//types
 local types = require(script.Parent.Parent.types)
 
---//dependencies
 local tween = require(script.Parent.Parent.dependencies.tween)
 
---//events
 local tweenEvent: RemoteEvent = script.Parent.Parent.events.tween
 
---//core
---main
-local client = {}
+--[[
+	This is the client environment. It handles all requests from the client
+	scripts to create tweens and also handles requests from the server to
+	handle tweens.
 
---contains a list of all of the current tweens
+	@class
+	@public
+]]
+
+local client = {}
 client._tweens = {}
 
---sets up event listeners
+-- Starts the event listeners.
+-- @private
+-- @returns never
 function client._start()
 	tweenEvent.OnClientEvent:Connect(function(isBulk: boolean, ...)
 		if isBulk == true then
@@ -30,19 +35,28 @@ function client._start()
 	end)
 end
 
---this is just a wrapper around _single. it takes the data in bulk and then passes it to the _single function
+-- This is a wrapper around the `_single` function. The `data` parameter is a
+-- array of the data that is going to the `_single` function.
+-- @private
+-- @param {{data}} data [The event data.]
+-- @returns never
 function client._bulk(event: types.events, data)
 	for _, objectData in pairs(data) do
 		client._single(event, objectData)
 	end
 end
 
---this function handles a event from the server and perfoms the requested action
+-- Handles a request to perform a certain type of event.
+-- @private
+-- @param {events} event [The type of event.]
+-- @param {data} data [The event data.]
+-- @returns never
 function client._single(event: types.events, data)
 	if event == "create" then
 		client:create(unpack(data))
 	elseif event == "destroy" then
 		client._tweens[data]:destroy()
+		client._tweens[data] = nil
 	elseif event == "play" then
 		client._tweens[data]:play()
 	elseif event == "stop" then
@@ -52,26 +66,22 @@ function client._single(event: types.events, data)
 	end
 end
 
---creates a tween object
-function client:create(
-	targets: types.targets,
-	info: types.info,
-	properties: types.properties,
-	tweenID: string?
-): tween.tween
-	local self: tween.tween = tween.new(targets, info, properties)
+-- Creates a tween object and adds it to the list of tweens.
+-- @public
+-- @extends normalTween constructor
+function client:create(targets: types.targets, info: types.info, properties: types.properties, tweenID: string?): types.normalTween
+	local self: types.normalTween = tween.normal(targets, info, properties)
 
-	--does it have a tweenID? if so the key is going to be that id
+	-- The `tweenID` paramter is intended for use by the server. This allows the server
+	-- to request a certain tween be changed.
 	if tweenID ~= nil then
 		client._tweens[tweenID] = self
-	else
-		--it does not have a tweenID so just push it into the array
-		table.insert(client._tweens, self)
 	end
 
 	return self
 end
 
+-- An alias to `create`
 client.Create = client.create
 
 return client

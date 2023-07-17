@@ -4,6 +4,10 @@
     
     Fluid is an exciting new library that is still in its early stages. As a result, it has not have undergone extensive testing in a wide range of production games just yet. This means that you might come across some bugs or find certain features missing as you explore its capabilities. However, rest assured that we are actively working to address these issues and incorporate user feedback to make Fluid even better. Your patience, understanding, and contributions are greatly appreciated as we continue to refine and enhance Fluid together. Let's embark on this journey, discover the potential of Fluid, and shape it into a reliable and feature-rich tool for creating incredible Roblox experiences!
 
+!!! info "A quick note..."
+    
+    Fluid draws inspiration from BoatTween, a key influence in its development. BoatTween has provided Fluid with essential lerping functions, making it possible for Fluid to exist. We express our heartfelt appreciation to the developers of BoatTween for their valuable contribution. If you're looking for a simpler option, we suggest giving BoatTween a try. You can find it here.
+
 <hr>
 
 ## Overview

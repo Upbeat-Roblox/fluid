@@ -1,12 +1,12 @@
---Lanred
---7/3/2023
+--[[
+	@title parser
+	@author Lanred
+	@version 1.0.0
+]]
 
---//modules
 local propertiesParser = require(script.properties)
 local infoParser = require(script.info)
 
---//core
---main
 return {
 	properties = propertiesParser,
 	info = infoParser,
