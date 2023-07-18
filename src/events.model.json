@@ -4,6 +4,10 @@
         {
             "Name": "tween",
             "ClassName": "RemoteEvent"
+        },
+        {
+            "Name": "easing",
+            "ClassName": "RemoteEvent"
         }
     ]
 }
