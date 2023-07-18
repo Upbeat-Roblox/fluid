@@ -35,17 +35,35 @@ server._tweens = {}
 -- @returns never
 function server:_start()
 	Players.PlayerAdded:Connect(function(player: Player)
-		tweenEvent:FireClient(player, "create", true, server._tweens)
+		tweenEvent:FireClient(player, "createOnJoin", true, server._tweens)
 	end)
 end
 
 -- Creates a server tween object and adds it to the list of tweens.
 -- @public
 -- @extends serverTween constructor
-function server:create(targets: types.targets, info: types.serverTweenInfo, properties: types.properties): types.serverTween
+function server:create(
+	targets: types.targets,
+	info: types.serverTweenInfo,
+	properties: types.properties
+): types.serverTween
 	local tweenID: string = generateTweenID()
 	local self: types.serverTween = tween.server(targets, info :: any, properties, tweenID)
-	server._tweens[tweenID] = self
+	server._tweens[tweenID] = {
+		data = { targets, info, properties, tweenID },
+		startTime = 0,
+		elapsedTime = 0,
+		state = Enum.PlaybackState.Begin,
+	}
+
+	-- Connect the `stateChanged` event so that whenever
+	-- the tween is started/resumbed we can update the
+	-- tween data with the new start time.
+	self.stateChanged:Connect(function(state: Enum.PlaybackState)
+		server._tweens[tweenID].state = state
+		server._tweens[tweenID].startTime = self._startTime
+		server._tweens[tweenID].elapsedTime = self._elapsedTime
+	end)
 
 	-- Connect the destroyed event so that whenever
 	-- the tween is finished it can be removed from the list
@@ -64,11 +82,15 @@ server.Create = server.create
 -- Creates a normal tween object.
 -- @public
 -- @extends normalTween constructor
-function server:createOnServer(targets: types.targets, info: types.normalTweenInfo, properties: types.properties): types.normalTween
+function server:createOnServer(
+	targets: types.targets,
+	info: types.normalTweenInfo,
+	properties: types.properties
+): types.normalTween
 	return tween.normal(targets, info, properties)
 end
 
--- An alias to `create`
+-- An alias to `createOnServer`
 server.CreateOnServer = server.createOnServer
 
 return server

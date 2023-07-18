@@ -54,6 +54,15 @@ end
 function client._single(event: types.events, data)
 	if event == "create" then
 		client:create(unpack(data))
+	elseif event == "createOnJoin" then
+		local self = client:create(unpack(data.data))
+		self._startTime = data.startTime
+		self._elapsedTime = data.elapsedTime
+		self._state = data.state
+
+		if data.state == Enum.PlaybackState.Playing then
+			self:play()
+		end
 	elseif event == "destroy" then
 		client._tweens[data]:destroy()
 		client._tweens[data] = nil
@@ -62,14 +71,20 @@ function client._single(event: types.events, data)
 	elseif event == "stop" then
 		client._tweens[data]:stop()
 	elseif event == "scrub" then
-		client._tweens[data.id]:scrub(data.position)
+		local tweenID: string, position: number = unpack(data)
+		client._tweens[tweenID]:scrub(position)
 	end
 end
 
 -- Creates a tween object and adds it to the list of tweens.
 -- @public
 -- @extends normalTween constructor
-function client:create(targets: types.targets, info: types.info, properties: types.properties, tweenID: string?): types.normalTween
+function client:create(
+	targets: types.targets,
+	info: types.info,
+	properties: types.properties,
+	tweenID: string?
+): types.normalTween
 	local self: types.normalTween = tween.normal(targets, info, properties)
 
 	-- The `tweenID` paramter is intended for use by the server. This allows the server

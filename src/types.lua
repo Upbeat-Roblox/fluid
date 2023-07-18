@@ -6,7 +6,7 @@
 
 type neverMethod = <a>(self: a) -> never
 
-export type events = "create" | "play" | "stop" | "scrub" | "destroy"
+export type events = "create" | "createOnJoin" | "play" | "stop" | "scrub" | "destroy"
 
 export type updateMethod = "RenderStepped" | "Stepped" | "Heartbeat"
 
@@ -83,7 +83,7 @@ export type baseTween = {
 	_properties: {
 		start: { [targets]: properties },
 		target: { [targets]: properties },
-		lerpers: { [targets]: { [string]: () -> (() -> any) } },
+		lerpers: { [targets]: { [string]: () -> () -> any } },
 		parameters: { [string]: info? },
 	},
 
