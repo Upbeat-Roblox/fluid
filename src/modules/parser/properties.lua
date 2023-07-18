@@ -16,7 +16,10 @@ local valueParser = require(script.Parent.value)
 -- @param {property} propertyData [The data for the property.]
 -- @param {normalTweenInfo|types.serverTweenInfo} info [The tween info.]
 -- @returns info
-local function getPropertyParameters(propertyData: types.propertyParameters, info: types.normalTweenInfo | types.serverTweenInfo): types.info
+local function getPropertyParameters(
+	propertyData: types.propertyParameters,
+	info: types.normalTweenInfo | types.serverTweenInfo
+): types.info
 	if typeof(propertyData) ~= "table" then
 		propertyData = {} :: any
 	end
@@ -44,11 +47,15 @@ end
 -- @param {targetsNoInstance} targets [The targets to tween.]
 -- @param {properties} properties [The properties of which to tween.]
 -- @param {normalTweenInfo|serverTweenInfo} info [The tween info.]
--- @returns {{ start: { [targetsNoInstance]: properties }, target: { [targetsNoInstance]: properties }, parameters: { [string]:info } }}
-return function(targets: types.targets, properties: types.properties, info: types.normalTweenInfo | types.serverTweenInfo)
+-- @returns {{ start: { [targetsNoInstance]: properties }, target: { [targetsNoInstance]: properties }, lerpers: { [targets]: { [string]: () -> ((alpha: number) -> any) } }, parameters: { [string]:info } }}
+return function(
+	targets: types.targets,
+	properties: types.properties,
+	info: types.normalTweenInfo | types.serverTweenInfo
+)
 	local startingProperties: { [types.targets]: types.properties } = {}
 	local targetProperties: { [types.targets]: types.properties } = {}
-	local propertyLerpers: { [types.targets]: { [string]: () -> ((alpha: number) -> any) } } = {}
+	local propertyLerpers: { [types.targets]: { [string]: () -> (alpha: number) -> any } } = {}
 	local propertyParameters: { [string]: types.info } = {}
 
 	-- Set the property parameters for each property.
