@@ -28,23 +28,26 @@ local class = {}
 class.__index = class
 setmetatable(class, baseTween.class)
 
+-- @private
 -- @extends baseTween play
 -- @returns never
-function class:playExtension()
+function class:_playExtension()
 	self:_startUpdater()
 	tweenEvent:FireAllClients(false, "play", self._tweenID)
 end
 
+-- @private
 -- @extends baseTween stop
 -- @returns never
-function class:stopExtension()
+function class:_stopExtension()
 	self:_endUpdater()
 	tweenEvent:FireAllClients(false, "stop", self._tweenID)
 end
 
+-- @private
 -- @extends baseTween _complete
 -- @returns never
-function class:completeExtension()
+function class:_completeExtension()
 	self:_endUpdater()
 end
 

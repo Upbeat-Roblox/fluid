@@ -59,21 +59,24 @@ local class = {}
 class.__index = class
 setmetatable(class, baseTween.class)
 
+-- @private
 -- @extends baseTween play
 -- @returns never
-function class:playExtension()
+function class:_playExtension()
 	self:_startMethod()
 end
 
+-- @private
 -- @extends baseTween stop
 -- @returns never
-function class:stopExtension()
+function class:_stopExtension()
 	self:_endMethod()
 end
 
+-- @private
 -- @extends baseTween _complete
 -- @returns never
-function class:completeExtension()
+function class:_completeExtension()
 	self:_endMethod()
 end
 

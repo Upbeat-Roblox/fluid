@@ -18,7 +18,7 @@ local easings = require(script.Parent.Parent.Parent.modules.easings)
 -- @returns never
 local function destroySignal(signal)
 	signal:DisconnectAll()
-    setmetatable(signal, nil)
+	setmetatable(signal, nil)
 	table.freeze(signal)
 end
 
@@ -36,7 +36,7 @@ end
 local class = {}
 class.__index = class
 
--- Starts the current tween.
+-- Starts the tween.
 -- @public
 -- @param {boolean?} forceRestart [If true the tween will restart.]
 -- @returns never
@@ -58,12 +58,12 @@ function class:play(forceRestart: boolean?)
 	self._startTime = os.clock() - self._elapsedTime
 
 	-- Fire the extension function, if there is one.
-	if self.playExtension ~= nil then
-		self:playExtension()
+	if self._playExtension ~= nil then
+		self:_playExtension()
 	end
 end
 
--- Stops the current tween.
+-- Stops the tween.
 -- @public
 -- @returns never
 function class:stop()
@@ -73,12 +73,12 @@ function class:stop()
 	self.stopped:Fire()
 
 	-- Fire the extension function, if there is one.
-	if self.stopExtension ~= nil then
-		self:stopExtension()
+	if self._stopExtension ~= nil then
+		self:_stopExtension()
 	end
 end
 
--- Scrub through the current tween.
+-- Scrub through the tween.
 -- @public
 -- @param {number} position [The position of the tween to move to.]
 -- @returns never
@@ -99,7 +99,7 @@ function class:scrub(position: number)
 	self:_update(math.clamp(position / self.duration, 0, 1))
 end
 
--- Destroys the current tween.
+-- Destroys the tween.
 -- @public
 -- @returns never
 function class:destroy()
@@ -138,10 +138,36 @@ function class:_updateState(state: Enum.PlaybackState)
 	end
 end
 
--- Updates an tween instances. Can take a `customDelta` parameter which
+-- Reverses the tween.
+-- @private
+-- @returns never
+function class:_reverse()
+	self._reversed = not self._reversed
+	self._elapsedTime = 0
+	self._startTime = os.clock()
+end
+
+-- Completes the tween.
+-- @private
+-- @returns never
+function class:_complete()
+	self:_updateState(Enum.PlaybackState.Completed)
+	self.completed:Fire()
+
+	if self.destroyOnComplete == true then
+		self:destroy()
+	end
+
+	-- Fire the extension function, if there is one.
+	if self._completeExtension ~= nil then
+		self:_completeExtension()
+	end
+end
+
+-- Updates an tween instances. Can take a `delta` parameter which
 -- is passed to `_updatePropertiesOnInstance`.
 -- @private
--- @param {number?} delta [The delta to use when calculating the value.]
+-- @param {number?} delta [The delta to use when calculating the values for the tween.]
 -- @returns never
 function class:_update(delta: number?)
 	-- This variable is used to make sure that the tween still has valid targets.
@@ -169,32 +195,6 @@ function class:_update(delta: number?)
 		else
 			self:_complete()
 		end
-	end
-end
-
--- Reverses the current tween.
--- @private
--- @returns never
-function class:_reverse()
-	self._reversed = not self._reversed
-	self._elapsedTime = 0
-	self._startTime = os.clock()
-end
-
--- This is called whenever a tween is completed.
--- @private
--- @returns never
-function class:_complete()
-	self:_updateState(Enum.PlaybackState.Completed)
-	self.completed:Fire()
-
-	if self.destroyOnComplete == true then
-		self:destroy()
-	end
-
-	-- Fire the extension function, if there is one.
-	if self.completeExtension ~= nil then
-		self:completeExtension()
 	end
 end
 
@@ -226,8 +226,6 @@ function class:_updatePropertiesOnInstance(instance: types.targets, customDelta:
 				delta = self._reversed == true and (1 - timeRatio) or timeRatio
 			end
 
-			-- When calculating the percent variable we need to determine
-			-- if the current property has a custom easing that oversides the tween easing.
 			percent = easings.easings[self._properties.parameters[property].easing](delta)
 			value = self._properties.lerpers[instance][property](percent)
 		end
@@ -246,7 +244,11 @@ return {
 	-- @param {normalTweenInfo|serverTweenInfo} info [The tween info.]
 	-- @param {properties} properties [The properties of which to tween.]
 	-- @returns baseTween
-	new = function(targets: types.tweenTargets, info: types.normalTweenInfo | types.serverTweenInfo, properties: types.properties): types.baseTween
+	new = function(
+		targets: types.tweenTargets,
+		info: types.normalTweenInfo | types.serverTweenInfo,
+		properties: types.properties
+	): types.baseTween
 		assert(
 			(typeof(targets) == "Instance" or typeof(targets) == "table"),
 			messages.creation.invalidTargets:format(typeof(targets))
@@ -254,7 +256,7 @@ return {
 		assert(typeof(properties) == "table", messages.creation.invalidProperties)
 
 		local parsedInfo: any = parser.info(info)
-		
+
 		-- Converting the targets to an array reduces project and file size.
 		-- The reason being it prevents update functions from having to check if the targets
 		-- is a Instance or array/dictionary.
