@@ -18,6 +18,8 @@
 
 local RunService = game:GetService("RunService")
 
+local easings = require(script.modules.easings)
+
 local isClient: boolean = RunService:IsClient()
 local environment
 
@@ -27,5 +29,6 @@ else
 	environment = require(script.environments.server)
 end
 
+environment.easings = easings
 environment:_start()
 return environment
