@@ -9,7 +9,7 @@ local register = require(script.register)
 local update = require(script.update)
 
 return {
-    easings = easings,
-    registerEasing = register,
-    updateEasing = update,
+	easings = easings,
+	registerEasing = register,
+	updateEasing = update,
 }

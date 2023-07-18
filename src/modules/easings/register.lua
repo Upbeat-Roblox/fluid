@@ -13,7 +13,7 @@ local easings = require(script.Parent.easings)
 -- @param {(time: number) -> number} easingFunction [The easing function.]
 -- @returns never
 return function(name: string, easingFunction: (time: number) -> number)
-    assert(easings[name] == nil, messages.easing.alreadyRegisteredStyle:format(name))
+	assert(easings[name] == nil, messages.easing.alreadyRegisteredStyle:format(name))
 
 	easings[name] = easingFunction
 end
