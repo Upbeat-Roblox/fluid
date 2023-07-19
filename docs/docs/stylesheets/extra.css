@@ -17,6 +17,8 @@
 }
 
 :root {
+    --md-typeset-a-color: #00b0ff;
+
     /* navbar color */
     --md-primary-fg-color: #3051a5;
     --md-primary-fg-color--light: #3051a51e;

@@ -48,10 +48,10 @@ end
 
 	@class
 	@public
-	@extends bareboneTween
+	@extends baseTween
 
-	@param {targets} targets [The targets to tween.]
-	@param {info} info [The tween info.]
+	@param {tweenTargets} targets [The targets to tween.]
+	@param {normalTweenInfo} info [The tween info.]
 	@param {properties} properties [The properties of which to tween.]
 ]]
 
@@ -106,7 +106,7 @@ end
 -- @private
 -- @extends baseTween constructor
 -- @returns normalTween
-return function(targets: types.tweenTargets, info: types.info, properties: types.properties)
+return function(targets: types.tweenTargets, info: types.normalTweenInfo, properties: types.properties)
 	-- This is given the type of `any` to prevent the type checker from screaming
 	-- that you cannot add `variable` to table '{ @metatable class, baseTween }'.
 	local baseClass: types.baseTween = baseTween.new(targets, info :: any, properties)

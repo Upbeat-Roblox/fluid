@@ -6,7 +6,7 @@
 
 type neverMethod = <a>(self: a) -> never
 
-export type events = "create" | "createOnJoin" | "play" | "stop" | "scrub" | "destroy"
+export type tweenEvents = "create" | "createOnJoin" | "play" | "stop" | "scrub" | "destroy"
 
 export type updateMethod = "RenderStepped" | "Stepped" | "Heartbeat"
 
@@ -26,7 +26,7 @@ export type tweenInfo = info & {
 }
 
 export type normalTweenInfo = tweenInfo & {
-	method: updateMethod,
+	method: updateMethod?,
 }
 
 export type serverTweenInfo = tweenInfo & {
@@ -49,13 +49,21 @@ export type properties = {
 	[string]: property,
 }
 
+export type internalTweenProperties = {
+	start: { [targets]: properties },
+	target: { [targets]: properties },
+	lerpers: { [targets]: { [string]: () -> () -> any } },
+	parameters: { [string]: info? },
+}
+
 export type baseTween = {
 	-- Public
 	-- Variables
-	targets: tweenTargets,
+	targets: targets,
 	reverses: boolean,
 	repeatCount: number,
 	duration: number,
+	method: updateMethod,
 	destroyOnComplete: boolean,
 	updateSteps: number,
 
@@ -78,34 +86,37 @@ export type baseTween = {
 	-- Variables
 	_startTime: number,
 	_elapsedTime: number,
+	_repeated: number,
 	_reversed: boolean,
 	_state: Enum.PlaybackState,
-	_properties: {
-		start: { [targets]: properties },
-		target: { [targets]: properties },
-		lerpers: { [targets]: { [string]: () -> () -> any } },
-		parameters: { [string]: info? },
-	},
+	_properties: internalTweenProperties,
 
 	-- Methods
 	_updateState: <a>(self: a, state: Enum.PlaybackState) -> never,
-	_update: <a>(self: a, customDelta: number?) -> never,
 	_reverse: neverMethod,
+	_restart: neverMethod,
 	_complete: neverMethod,
+	_update: <a>(self: a, delta: number?) -> never,
 	_updatePropertiesOnInstance: <a>(self: a, instance: targets, customDelta: number?) -> never,
 }
 
-export type normalTween = baseTween & {
+type extensionMethods = {
+	_playExtension: neverMethod,
+	_stopExtension: neverMethod,
+	_completeExtension: neverMethod,
+}
+
+export type normalTween = baseTween & extensionMethods & {
 	-- Private
 	-- Variables
-	_updateMethod: RBXScriptSignal,
+	_updateMethod: RBXScriptConnection,
 
 	-- Methods
 	_startMethod: neverMethod,
 	_endMethod: neverMethod,
 }
 
-export type serverTween = baseTween & {
+export type serverTween = baseTween & extensionMethods & {
 	-- Private
 	-- Variables
 	_updaterStart: number,

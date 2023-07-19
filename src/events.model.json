@@ -8,6 +8,10 @@
         {
             "Name": "easing",
             "ClassName": "RemoteEvent"
+        },
+        {
+            "Name": "request",
+            "ClassName": "RemoteEvent"
         }
     ]
 }

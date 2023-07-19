@@ -28,6 +28,7 @@ return function(info: types.normalTweenInfo | types.serverTweenInfo)
 		error(messages.parser.updateStepsOnClient, 0)
 	end
 
+	local reverses: boolean = checkTypeOrError(info.reverses, "reverses", "boolean", false)
 	local parsedInfo = {
 		easing = checkTypeOrError(info.easing, "easing", "string", "Linear"),
 		method = checkTypeOrError(
@@ -37,9 +38,9 @@ return function(info: types.normalTweenInfo | types.serverTweenInfo)
 			isClient == true and defaultUpdateMethodForClient or defaultUpdateMethodForServer
 		),
 		duration = checkTypeOrError(info.duration, "duration", "number", 1),
-		repeatCount = checkTypeOrError(info.repeatCount, "repeatCount", "number", 1),
+		repeatCount = checkTypeOrError(info.repeatCount, "repeatCount", "number", reverses == true and -1 or 1),
 		updateSteps = checkTypeOrError((info :: any).updateSteps, "updateSteps", "number", 5),
-		reverses = checkTypeOrError(info.reverses, "reverses", "boolean", false),
+		reverses = reverses,
 		destroyOnComplete = checkTypeOrError(info.destroyOnComplete, "destroyOnComplete", "boolean", false),
 	}
 
@@ -53,6 +54,11 @@ return function(info: types.normalTweenInfo | types.serverTweenInfo)
 		error(messages.parser.invalidUpdateMethod:format(parsedInfo.method), 0)
 	elseif isClient == false and parsedInfo.method == "RenderStepped" then
 		error(messages.parser.renderSteppedOnServer, 0)
+	end
+
+	-- Convert the repeat count to math.huge if its less than zero.
+	if parsedInfo.repeatCount < 0 then
+		parsedInfo.repeatCount = math.huge
 	end
 
 	return parsedInfo

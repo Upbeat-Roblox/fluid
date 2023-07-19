@@ -17,10 +17,10 @@ local tweenEvent: RemoteEvent = script.Parent.Parent.Parent.events.tween
 
 	@class
 	@public
-	@extends bareboneTween
+	@extends baseTween
 
-	@param {targets} targets [The targets to tween.]
-	@param {info} info [The tween info.]
+	@param {tweenTargets} targets [The targets to tween.]
+	@param {serverTweenInfo} info [The tween info.]
 	@param {properties} properties [The properties of which to tween.]
 ]]
 
@@ -61,21 +61,23 @@ function class:_startUpdater()
 	self._updaterStart = updaterStart
 
 	task.spawn(function()
-		for _step = 1, self.updateSteps do
-			-- Confirm that the tween is still running and has not been stopped / restarted.
-			if self._updaterStart ~= updaterStart then
-				break
+		while self._state == Enum.PlaybackState.Playing do
+			for _step = 1, self.updateSteps do
+				-- Confirm that the tween is still running and has not been stopped / restarted.
+				if self._updaterStart ~= updaterStart then
+					break
+				end
+
+				self._elapsedTime = os.clock() - self._startTime
+
+				-- The `normal` tween class updates on a different thread.
+				-- However since the `server` tween class is only intended to update a few times it does not use a seperate thread to update.
+				-- This could cause performance problems if the developer attempts to have a large step count
+				-- but if the developer is attemping to make the tween smooth they should be using the `normal` tween class instead.
+				self:_update()
+
+				task.wait(self.duration / self.updateSteps)
 			end
-
-			self._elapsedTime = os.clock() - self._startTime
-
-			-- The `normal` tween class updates on a different thread.
-			-- However since the `server` tween class is only intended to update a few times it does not use a seperate thread to update.
-			-- This could cause performance problems if the developer attempts to have a large step count
-			-- but if the developer is attemping to make the tween smooth they should be using the `normal` tween class instead.
-			self:_update()
-
-			task.wait(self.duration / self.updateSteps)
 		end
 	end)
 end

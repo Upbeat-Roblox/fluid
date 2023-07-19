@@ -23,13 +23,13 @@ local function destroySignal(signal)
 end
 
 --[[
-	A class that represents a tween without any update method or methods, besides `destroy`.
+	An extendable class that has methods used by all variations of the `tween` class.
 
 	@class
 	@private
 
-	@param {targets} targets [The targets to tween.]
-	@param {info} info [The tween info.]
+	@param {tweenTargets} targets [The targets to tween.]
+	@param {normalTweenInfo|serverTweenInfo} info [The tween info.]
 	@param {properties} properties [The properties of which to tween.]
 ]]
 
@@ -116,8 +116,9 @@ function class:destroy()
 	destroySignal(self.resumed)
 	destroySignal(self.destroyed)
 
-	-- This destroys the object and freezes it to render is unusable.
+	-- This destroys the object, clears, and freezes it to render is unusable.
 	setmetatable(self, nil)
+	table.clear(self)
 	table.freeze(self)
 end
 
@@ -138,11 +139,19 @@ function class:_updateState(state: Enum.PlaybackState)
 	end
 end
 
--- Reverses the tween.
+-- Restarts and reverses the tween.
 -- @private
 -- @returns never
 function class:_reverse()
 	self._reversed = not self._reversed
+	self._elapsedTime = 0
+	self._startTime = os.clock()
+end
+
+-- Restarts the tween.
+-- @private
+-- @returns never
+function class:_restart()
 	self._elapsedTime = 0
 	self._startTime = os.clock()
 end
@@ -171,7 +180,7 @@ end
 -- @returns never
 function class:_update(delta: number?)
 	-- This variable is used to make sure that the tween still has valid targets.
-	-- If it does not then its processing power.
+	-- If it does not then its wasting processing power and needs to be stopped.
 	local targetCount: number = 0
 
 	for index: number, target: types.targets in pairs(self.targets) do
@@ -190,8 +199,14 @@ function class:_update(delta: number?)
 	end
 
 	if self._elapsedTime >= self.duration then
-		if self.reverses == true then
-			self:_reverse()
+		self._repeated += 1
+		
+		if self._repeated < self.repeatCount then
+			if self.reverses == true then
+				self:_reverse()
+			else
+				self:_restart()
+			end
 		else
 			self:_complete()
 		end
@@ -205,8 +220,8 @@ end
 -- @returns never
 function class:_updatePropertiesOnInstance(instance: types.targets, customDelta: number?)
 	for property: string, targetValue: types.dataTypeWithFunction in pairs(self._properties.target[instance]) do
-		-- If a custom delta is provided then the duration needs to be excused
-		-- the way this is done is by using math.huge. If a custom delta is not provided
+		-- If a custom delta is provided then the duration needs to be excused.
+		-- The way this is done is by using math.huge. If a custom delta is not provided
 		-- it defaults to the property duration or the tween duration.
 		local duration: number = typeof(customDelta) == "number" and math.huge
 			or self._properties.parameters[property].duration
@@ -273,8 +288,6 @@ return {
 			duration = parsedInfo.duration,
 			method = parsedInfo.method,
 			destroyOnComplete = parsedInfo.destroyOnComplete,
-			-- The `updateSteps` variable is only valid on the server but is still parsed
-			-- as the base tween does not know what type of tween this is.
 			updateSteps = parsedInfo.updateSteps,
 
 			-- Events
@@ -289,6 +302,7 @@ return {
 			-- Variables
 			_startTime = 0,
 			_elapsedTime = 0,
+			_repeated = 0,
 			_reversed = false,
 			_state = Enum.PlaybackState.Begin,
 			_properties = parser.properties(targets :: types.targets, properties, parsedInfo),

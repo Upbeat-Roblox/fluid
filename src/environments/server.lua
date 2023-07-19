@@ -4,24 +4,50 @@
 	@version 1.0.0
 ]]
 
-local Players = game:GetService("Players")
-
 local types = require(script.Parent.Parent.types)
 
-local tween = require(script.Parent.Parent.dependencies.tween)
+local tween = require(script.Parent.Parent.classes.tween)
+
+local easings = require(script.Parent.Parent.modules.easings)
 
 local tweenEvent: RemoteEvent = script.Parent.Parent.events.tween
+local easingEvent: RemoteEvent = script.Parent.Parent.events.easing
+local requestEvent: RemoteEvent = script.Parent.Parent.events.request
 
 -- Generates a tween ID.
--- TODO: Remove reliance on `os.clock`.
+-- TODO?: Remove reliance on `os.clock`.
 -- @returns string
 local function generateTweenID(): string
 	return tostring(os.clock())
 end
 
+type eventSafeProperties = {
+	start: { [number]: types.properties },
+	target: { [number]: types.properties },
+}
+
+-- Converts a the tween `_properties` variable into a
+-- event safe dictionary.
+-- @param {tweenTargets} targets [The tween targets.]
+-- @param {internalTweenProperties} properties [The properties to convert.]
+-- @returns eventSafeProperties
+local function convertPropertiesToEventSafe(targets: types.targets, properties: types.internalTweenProperties): eventSafeProperties
+	local eventSafeProperties: eventSafeProperties = {
+		start = {},
+		target = {},
+	}
+
+	for index: number, target: types.targets in ipairs(targets) do
+		eventSafeProperties.start[index] = properties.start[target]
+		eventSafeProperties.target[index] = properties.target[target]
+	end
+
+	return eventSafeProperties
+end
+
 --[[
-	This is the server environment. It is used to create tweens on
-	the server and pass them to the clients.
+	This is the server environment. It handles all requests from server
+	scripts to create tweens and also offload tween work to the clients.
 
 	@class
 	@public
@@ -34,8 +60,9 @@ server._tweens = {}
 -- @private
 -- @returns never
 function server:_start()
-	Players.PlayerAdded:Connect(function(player: Player)
-		tweenEvent:FireClient(player, "createOnJoin", true, server._tweens)
+	requestEvent.OnServerEvent:Connect(function(player: Player)
+		tweenEvent:FireClient(player, true, "createOnJoin", server._tweens)
+		easingEvent:FireClient(player, true, easings.easings)
 	end)
 end
 
@@ -48,16 +75,17 @@ function server:create(
 	properties: types.properties
 ): types.serverTween
 	local tweenID: string = generateTweenID()
-	local self: types.serverTween = tween.server(targets, info :: any, properties, tweenID)
+	local self: types.serverTween = tween.server(targets, info, properties, tweenID)
 	server._tweens[tweenID] = {
-		data = { targets, info, properties, tweenID },
+		data = { self.targets, info, properties, tweenID },
+		properties = convertPropertiesToEventSafe(self.targets, self._properties),
 		startTime = 0,
 		elapsedTime = 0,
 		state = Enum.PlaybackState.Begin,
 	}
 
 	-- Connect the `stateChanged` event so that whenever
-	-- the tween is started/resumbed we can update the
+	-- the tween is started / resumed we can update the
 	-- tween data with the new start time.
 	self.stateChanged:Connect(function(state: Enum.PlaybackState)
 		server._tweens[tweenID].state = state

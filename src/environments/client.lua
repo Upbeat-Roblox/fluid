@@ -6,9 +6,13 @@
 
 local types = require(script.Parent.Parent.types)
 
-local tween = require(script.Parent.Parent.dependencies.tween)
+local tween = require(script.Parent.Parent.classes.tween)
+
+local easings = require(script.Parent.Parent.modules.easings)
 
 local tweenEvent: RemoteEvent = script.Parent.Parent.events.tween
+local easingEvent: RemoteEvent = script.Parent.Parent.events.easing
+local requestEvent: RemoteEvent = script.Parent.Parent.events.request
 
 --[[
 	This is the client environment. It handles all requests from the client
@@ -26,42 +30,56 @@ client._tweens = {}
 -- @private
 -- @returns never
 function client._start()
+	-- Request the tweens and easings from the server.
+	requestEvent:FireServer()
+
 	tweenEvent.OnClientEvent:Connect(function(isBulk: boolean, ...)
 		if isBulk == true then
-			client._bulk(...)
+			client._tweenBulk(...)
 		else
-			client._single(...)
+			client._tweenSingle(...)
+		end
+	end)
+
+	easingEvent.OnClientEvent:Connect(function(isBluk: boolean, ...)
+		if isBluk == true then
+			client._easingBulk(...)
+		else
+			client._easingSingle(...)
 		end
 	end)
 end
 
--- This is a wrapper around the `_single` function. The `data` parameter is a
--- array of the data that is going to the `_single` function.
+-- This is a wrapper around the `_tweenSingle` function. The `data` parameter is a
+-- array of the data that is going to the `_tweenSingle` function.
 -- @private
--- @param {{data}} data [The event data.]
+-- @param {{ data }} data [The event data.]
 -- @returns never
-function client._bulk(event: types.events, data)
+function client._tweenBulk(event: types.tweenEvents, data)
 	for _, objectData in pairs(data) do
-		client._single(event, objectData)
+		client._tweenSingle(event, objectData)
 	end
 end
 
--- Handles a request to perform a certain type of event.
+-- Handles a request to perform a certain type of tween event.
 -- @private
--- @param {events} event [The type of event.]
+-- @param {tweenEvents} event [The type of event.]
 -- @param {data} data [The event data.]
 -- @returns never
-function client._single(event: types.events, data)
+function client._tweenSingle(event: types.tweenEvents, data)
 	if event == "create" then
 		client:create(unpack(data))
 	elseif event == "createOnJoin" then
 		local self = client:create(unpack(data.data))
+		self._properties.start = data.properties.start
+		self._properties.target = data.properties.target
 		self._startTime = data.startTime
 		self._elapsedTime = data.elapsedTime
-		self._state = data.state
 
 		if data.state == Enum.PlaybackState.Playing then
 			self:play()
+		else
+			self._state = data.state
 		end
 	elseif event == "destroy" then
 		client._tweens[data]:destroy()
@@ -76,12 +94,32 @@ function client._single(event: types.events, data)
 	end
 end
 
+-- This is a wrapper around the `_easingSingle` function. The `data` parameter is a
+-- array of the data that is going to the `_easingSingle` function.
+-- @private
+-- @param {{ data }} data [The event data.]
+-- @returns never
+function client._easingBulk(data)
+	for _, objectData in pairs(data) do
+		client._easingSingle(unpack(objectData))
+	end
+end
+
+-- Handles a request to register / update a easing.
+-- @private
+-- @param {string} name [The name of the easing.]
+-- @param {(time: number) -> number} easingFunction [The easing function.]
+-- @returns never
+function client._easingSingle(name: string, easingFunction: (time: number) -> number)
+	easings.easings[name] = easingFunction
+end
+
 -- Creates a tween object and adds it to the list of tweens.
 -- @public
 -- @extends normalTween constructor
 function client:create(
 	targets: types.targets,
-	info: types.info,
+	info: types.normalTweenInfo,
 	properties: types.properties,
 	tweenID: string?
 ): types.normalTween

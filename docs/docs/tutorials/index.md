@@ -29,7 +29,7 @@ To get started with Fluid, you have multiple options for installation:
 You can download Fluid directly as a Roblox model from the Roblox Library. Simply search for "Fluid" in the Roblox Library, find the latest version, and insert it into your project.
 
 ### GitHub Releases
-Fluid is also available for download from GitHub Releases. Visit the Fluid repository on GitHub, navigate to the "Releases" section, and choose the latest release. Download the appropriate files for your project and follow the instructions provided in the repository's README to install Fluid in your Roblox project.
+Fluid is also available for download from GitHub Releases. Visit the [Fluid repository](https://github.com/Lanred-Dev/Fluid) on GitHub, navigate to the ["Releases" section](https://github.com/Lanred-Dev/Fluid/releases), and choose the latest release. Then download the fluid.rbxm file.
 
 ### Wally Packge
 If you prefer using package managers, you can install Fluid using Wally, a package manager designed specifically for Roblox. Follow these steps to install Fluid via Wally:

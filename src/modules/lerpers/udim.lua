@@ -1,6 +1,6 @@
 --[[
 	@title lerpers/udim
-	@author Lanred / Validark
+	@author Lanred, Validark
 	@version 1.0.0
 ]]
 
