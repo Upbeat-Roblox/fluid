@@ -12,7 +12,9 @@ Introducing **Fluid** – your exciting alternative to Roblox's TweenService! Th
 
 ## Resources
 [📦Installation](monke-mob.github.io/fluid/tutorials/#installation)
+
 [📚Documentation](monke-mob.github.io/fluid/tutorials/)
+
 [🧑Credits](#credits)
 
 </div>
