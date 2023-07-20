@@ -1,7 +1,6 @@
 --[[
 	@title lerpers/normal
 	@author Lanred
-	@version 1.0.0
 ]]
 
 type normalLerpValues = CFrame | Vector3 | Vector2 | UDim2

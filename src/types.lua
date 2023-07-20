@@ -1,10 +1,16 @@
 --[[
 	@title types
 	@author Lanred
-	@version 1.0.0
 ]]
 
 type neverMethod = <a>(self: a) -> never
+
+export type eventSafeProperties = {
+	start: { [number]: properties },
+	target: { [number]: properties },
+}
+
+export type arrayTypes = "Array" | "Dictionary" | "Mixed" | "Empty"
 
 export type tweenEvents = "create" | "createOnJoin" | "play" | "stop" | "scrub" | "destroy"
 
@@ -60,6 +66,7 @@ export type baseTween = {
 	-- Public
 	-- Variables
 	targets: targets,
+	properties: properties,
 	reverses: boolean,
 	repeatCount: number,
 	duration: number,
@@ -84,6 +91,7 @@ export type baseTween = {
 
 	-- Private
 	-- Variables
+	_info: any,
 	_startTime: number,
 	_elapsedTime: number,
 	_repeated: number,
@@ -98,6 +106,7 @@ export type baseTween = {
 	_complete: neverMethod,
 	_update: <a>(self: a, delta: number?) -> never,
 	_updatePropertiesOnInstance: <a>(self: a, instance: targets, customDelta: number?) -> never,
+	_recalculateProperties: <a>(self: a, starting: { [targets]: properties }, target: { [targets]: properties }) -> never,
 }
 
 type extensionMethods = {

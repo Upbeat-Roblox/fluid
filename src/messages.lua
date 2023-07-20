@@ -1,7 +1,6 @@
 --[[
 	@title messages
 	@author Lanred
-	@version 1.0.0
 ]]
 
 return {
@@ -10,6 +9,7 @@ return {
 	creation = {
 		invalidTargets = "'%s' is not a valid type for targets. A target must be a 'Instance', array of 'Instance', or a dictionary.",
 		invalidProperties = "The properties argument must be a dictionary containing the target property values.",
+		invalidServerTargets = "'%s' is not a valid type for targets. A target must be a 'Instance' or a array of 'Instance' on the server.",
 	},
 
 	easing = {

@@ -1,7 +1,6 @@
 --[[
 	@title parser/info
 	@author Lanred
-	@version 1.0.0
 ]]
 
 local RunService = game:GetService("RunService")

@@ -1,7 +1,6 @@
 --[[
 	@title lerpers/number
 	@author Lanred
-	@version 1.0.0
 ]]
 
 -- Lerps a number.

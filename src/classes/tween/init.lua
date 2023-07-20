@@ -1,7 +1,6 @@
 --[[
 	@title tween
 	@author Lanred
-	@version 1.0.0
 ]]
 
 local normalTween = require(script.normal)

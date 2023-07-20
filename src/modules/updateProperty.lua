@@ -1,7 +1,6 @@
 --[[
 	@title updateProperty
 	@author Lanred
-	@version 1.0.0
 ]]
 
 local types = require(script.Parent.Parent.types)

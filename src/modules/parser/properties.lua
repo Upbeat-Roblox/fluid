@@ -1,7 +1,6 @@
 --[[
 	@title parser/properties
 	@author Lanred
-	@version 1.0.0
 ]]
 
 local types = require(script.Parent.Parent.Parent.types)
@@ -47,14 +46,18 @@ end
 -- @param {targetsNoInstance} targets [The targets to tween.]
 -- @param {properties} properties [The properties of which to tween.]
 -- @param {normalTweenInfo|serverTweenInfo} info [The tween info.]
+-- @param {{ [types.targets]: types.properties }?} customStartingProperties [The starting properties to use.]
+-- @param {{ [types.targets]: types.properties }?} customTargetProperties [The target properties to use.]
 -- @returns {{ start: { [targetsNoInstance]: properties }, target: { [targetsNoInstance]: properties }, lerpers: { [targets]: { [string]: () -> ((alpha: number) -> any) } }, parameters: { [string]:info } }}
 return function(
 	targets: types.targets,
 	properties: types.properties,
-	info: types.normalTweenInfo | types.serverTweenInfo
+	info: types.normalTweenInfo | types.serverTweenInfo,
+	customStartingProperties: { [types.targets]: types.properties }?,
+	customTargetProperties: { [types.targets]: types.properties }?
 )
-	local startingProperties: { [types.targets]: types.properties } = {}
-	local targetProperties: { [types.targets]: types.properties } = {}
+	local startingProperties: { [types.targets]: types.properties } = customStartingProperties or {}
+	local targetProperties: { [types.targets]: types.properties } = customTargetProperties or {}
 	local propertyLerpers: { [types.targets]: { [string]: () -> (alpha: number) -> any } } = {}
 	local propertyParameters: { [string]: types.info } = {}
 
@@ -65,17 +68,26 @@ return function(
 
 	-- Set the starting and target property values.
 	for _index: number, target: any in pairs(targets) do
-		startingProperties[target] = {}
-		targetProperties[target] = {}
+		if customStartingProperties == nil and customTargetProperties == nil then
+			startingProperties[target] = {}
+			targetProperties[target] = {}
+		end
+
 		propertyLerpers[target] = {}
 
 		-- Register the values on a per instance basis.
 		for property: string, propertyData: types.property in pairs(properties) do
-			local startValue: types.dataTypeNoFunction, targetValue: types.dataTypeNoFunction =
-				valueParser(target, property, propertyData)
-			startingProperties[target][property] = startValue :: any
-			targetProperties[target][property] = targetValue :: any
-			propertyLerpers[target][property] = lerpers[typeof(targetValue)](startValue, targetValue)
+			if customStartingProperties == nil and customTargetProperties == nil then
+				local startValue: types.dataTypeNoFunction, targetValue: types.dataTypeNoFunction =
+					valueParser(target, property, propertyData)
+				startingProperties[target][property] = startValue :: any
+				targetProperties[target][property] = targetValue :: any
+				propertyLerpers[target][property] = lerpers[typeof(targetValue)](startValue, targetValue)
+			else
+				local startValue: types.dataTypeNoFunction = startingProperties[target][property] :: any
+				local targetValue: types.dataTypeNoFunction = targetProperties[target][property] :: any
+				propertyLerpers[target][property] = lerpers[typeof(targetValue)](startValue, targetValue)
+			end
 		end
 	end
 

@@ -1,7 +1,6 @@
 --[[
 	@title lerpers/boolean
 	@author Lanred
-	@version 1.0.0
 ]]
 
 -- Lerps a boolean.

@@ -1,7 +1,6 @@
 --[[
 	@title checkTypeOrError
 	@author Lanred
-	@version 1.0.0
 ]]
 
 local messages = require(script.Parent.Parent.messages)

@@ -1,7 +1,6 @@
 --[[
 	@title parser
 	@author Lanred
-	@version 1.0.0
 ]]
 
 local propertiesParser = require(script.properties)

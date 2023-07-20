@@ -1,13 +1,12 @@
 --[[
 	@title parser/value
 	@author Lanred
-	@version 1.0.0
 ]]
 
 local types = require(script.Parent.Parent.Parent.types)
 local messages = require(script.Parent.Parent.Parent.messages)
 
-type arrayTypes = "Array" | "Dictionary" | "Mixed" | "Empty"
+local getTableType = require(script.Parent.Parent.getTableType)
 
 -- Gets a property value from a model.
 -- @param {Model} model [They model to get the value from.]
@@ -26,11 +25,11 @@ local function getPropertyValueFromModel(model: Model, property: string): types.
 
 			local value: Color3 | number = (instance :: any)[property]
 
-			-- In reality having not all BaseParts be the same
+			-- In reality having all `BaseParts` not be the same
 			-- will not affect the tween but there would be no way
 			-- for the parser to get a certain starting value.
 			-- TODO: Find ways to improve this so that not all
-			-- BaseParts have to have the same value.
+			-- `BaseParts` have to have the same value.
 			if propertyValue == nil then
 				propertyValue = value
 			elseif value ~= propertyValue then
@@ -39,7 +38,7 @@ local function getPropertyValueFromModel(model: Model, property: string): types.
 		end
 
 		-- If not starting value was set then that means that no valid
-		-- BaseParts where found.
+		-- `BaseParts` where found.
 		if propertyValue == nil then
 			error(messages.parser.noValidModelBaseParts:format(model.Name), 0)
 		end
@@ -91,32 +90,6 @@ local function getStartAndTargetFromValueArray(
 	return startWasDefined, start, target
 end
 
--- @author XAXA
--- @source https://devforum.roblox.com/t/detecting-type-of-table-empty-array-dictionary-mixedtable/292323/15
--- @param {table} t [The table to type check.]
--- @returns arrayTypes
-local function getTableType(t): arrayTypes
-	if typeof(t) ~= "table" or next(t) == nil then
-		return "Empty"
-	end
-	local isArray = true
-	local isDictionary = true
-	for k, _ in next, t do
-		if typeof(k) == "number" and k % 1 == 0 and k > 0 then
-			isDictionary = false
-		else
-			isArray = false
-		end
-	end
-	if isArray then
-		return "Array"
-	elseif isDictionary then
-		return "Dictionary"
-	else
-		return "Mixed"
-	end
-end
-
 -- Gets the start and target property values for a property.
 -- @param {targets} instance [The instance to get the values from.]
 -- @param {string} property [The property to use for the values.]
@@ -127,7 +100,7 @@ return function(
 	property: string,
 	propertyParameters: types.propertyParameters
 ): (types.dataTypeNoFunction, types.dataTypeNoFunction)
-	local propertyParametersTableType: arrayTypes = getTableType(propertyParameters)
+	local propertyParametersTableType: types.arrayTypes = getTableType(propertyParameters)
 
 	assert(
 		(propertyParametersTableType == "Dictionary" and typeof(propertyParameters.value) ~= "function")

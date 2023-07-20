@@ -1,7 +1,6 @@
 --[[
 	@title easings/easings
 	@author Lanred, Validark, Robert Penner, Yuichi Tateno, Emmanuel Oga
-	@version 1.0.0
 ]]
 
 local halfPI = math.pi / 2

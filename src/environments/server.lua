@@ -1,7 +1,6 @@
 --[[
 	@title environments/server
 	@author Lanred
-	@version 1.0.0
 ]]
 
 local types = require(script.Parent.Parent.types)
@@ -21,18 +20,16 @@ local function generateTweenID(): string
 	return tostring(os.clock())
 end
 
-type eventSafeProperties = {
-	start: { [number]: types.properties },
-	target: { [number]: types.properties },
-}
-
 -- Converts a the tween `_properties` variable into a
 -- event safe dictionary.
 -- @param {tweenTargets} targets [The tween targets.]
 -- @param {internalTweenProperties} properties [The properties to convert.]
 -- @returns eventSafeProperties
-local function convertPropertiesToEventSafe(targets: types.targets, properties: types.internalTweenProperties): eventSafeProperties
-	local eventSafeProperties: eventSafeProperties = {
+local function convertPropertiesToEventSafe(
+	targets: types.targets,
+	properties: types.internalTweenProperties
+): types.eventSafeProperties
+	local eventSafeProperties: types.eventSafeProperties = {
 		start = {},
 		target = {},
 	}

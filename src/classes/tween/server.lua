@@ -1,14 +1,45 @@
 --[[
 	@title tween/server
 	@author Lanred
-	@version 1.0.0
 ]]
 
 local types = require(script.Parent.Parent.Parent.types)
+local messages = require(script.Parent.Parent.Parent.messages)
 
 local baseTween = require(script.Parent.base)
 
+local getTableType = require(script.Parent.Parent.Parent.modules.getTableType)
+
 local tweenEvent: RemoteEvent = script.Parent.Parent.Parent.events.tween
+
+-- Confirms that the targets are either an array of `Instances`
+-- or an `Instance`.
+-- @param {tweenTargets} targets [The variable to check.]
+-- @returns
+local function checkTargetsType(targets: types.tweenTargets): "instance" | "nonInstance"
+	if typeof(targets) == "table" then
+		local tableType: types.arrayTypes = getTableType(targets)
+
+		if tableType == "Array" then
+			local targetsType: string = "instance"
+
+			for _index: number, instance in ipairs(targets) do
+				if typeof(instance) ~= "Instance" then
+					targetsType = "nonInstance"
+					break
+				end
+			end
+
+			return targetsType :: any
+		else
+			return "nonInstance"
+		end
+	elseif typeof(targets) == "Instance" then
+		return "instance"
+	end
+
+	return "nonInstance"
+end
 
 --[[
 	Represents a tween object created by the server. This is not the same as the tween class!
@@ -94,6 +125,8 @@ end
 -- @param {string} tweenID [The ID of the tween used by both environments.]
 -- @returns serverTween
 return function(targets: types.tweenTargets, info: types.serverTweenInfo, properties: types.properties, tweenID: string)
+	assert(checkTargetsType(targets) == "instance", messages.creation.invalidServerTargets:format(typeof(targets)))
+
 	-- This is given the type of `any` to prevent the type checker from screaming
 	-- that you cannot add `variable` to table '{ @metatable class, baseTween }'.
 	local baseClass: types.baseTween = baseTween.new(targets, info :: any, properties)

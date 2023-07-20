@@ -1,19 +1,24 @@
 --[[
-  _____   _           _       _ 
- |  ___| | |  _   _  (_)   __| |
- | |_    | | | | | | | |  / _` |
- |  _|   | | | |_| | | | | (_| |
- |_|     |_|  \__,_| |_|  \__,_|
+	      ___           ___       ___                       ___     
+	     /\  \         /\__\     /\__\          ___        /\  \    
+	    /::\  \       /:/  /    /:/  /         /\  \      /::\  \   
+	   /:/\:\  \     /:/  /    /:/  /          \:\  \    /:/\:\  \  
+	  /::\~\:\  \   /:/  /    /:/  /  ___      /::\__\  /:/  \:\__\ 
+	 /:/\:\ \:\__\ /:/__/    /:/__/  /\__\  __/:/\/__/ /:/__/ \:|__|
+	 \/__\:\ \/__/ \:\  \    \:\  \ /:/  / /\/:/  /    \:\  \ /:/  /
+	      \:\__\    \:\  \    \:\  /:/  /  \::/__/      \:\  /:/  / 
+	       \/__/     \:\  \    \:\/:/  /    \:\__\       \:\/:/  /  
+	                  \:\__\    \::/  /      \/__/        \::/__/   
+	                   \/__/     \/__/                     ~~       
 
- Devforum Post:
- Github: https://github.com/Lanred-Dev/Fluid
- Documentation: https://lanred-dev.github.io/Fluid
+	Devforum Post:
+	Github: https://github.com/monke-mob/fluid
+	Documentation: https://monke-mob.github.io/fluid
 ]]
 
 --[[
 	@title fluid
 	@author Lanred
-	@version 1.0.0
 ]]
 
 local RunService = game:GetService("RunService")

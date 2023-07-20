@@ -1,7 +1,6 @@
 --[[
 	@title tween/base
 	@author Lanred
-	@version 1.0.0
 ]]
 
 local types = require(script.Parent.Parent.Parent.types)
@@ -131,8 +130,8 @@ class.Destroy = class.destroy
 -- @returns never
 function class:_updateState(state: Enum.PlaybackState)
 	-- If the new state is the same as the current state then
-	-- we dont need to update. This prevents the stateChanged event from firing due to
-	-- duplicate changes.
+	-- we dont need to update. This prevents the `stateChanged` event
+	-- from firing due to duplicate changes.
 	if self._state ~= state then
 		self._state = state
 		self.stateChanged:Fire(state)
@@ -184,7 +183,7 @@ function class:_update(delta: number?)
 	local targetCount: number = 0
 
 	for index: number, target: types.targets in pairs(self.targets) do
-		-- The only way to check if its still a valid target is if its a Instance.
+		-- The only way to check if its still a valid target is if its a `Instance`.
 		if typeof(target) == "Instance" and target.Parent == nil then
 			table.remove(self.targets, index)
 			continue
@@ -250,6 +249,14 @@ function class:_updatePropertiesOnInstance(instance: types.targets, customDelta:
 	end
 end
 
+-- Recalculates the properties for the tween.
+-- @param {{ [types.targets]: types.properties }} starting [The starting properties to use.]
+-- @param {{ [types.targets]: types.properties }} target [The target properties to use.]
+-- @returns never
+function class:_recalculateProperties(starting: { [types.targets]: types.properties }, target: { [types.targets]: types.properties })
+	self._properties = parser.properties(self.targets, self.properties, self._info, starting, target)
+end
+
 return {
 	-- This prevents the class constructor from being exposed directly in the class
 	-- and instead seperates the two to prevent the constructor from being apart of the class
@@ -274,7 +281,7 @@ return {
 
 		-- Converting the targets to an array reduces project and file size.
 		-- The reason being it prevents update functions from having to check if the targets
-		-- is a Instance or array/dictionary.
+		-- is a Instance or array / dictionary.
 		if typeof(targets) == "Instance" then
 			targets = { targets }
 		end
@@ -283,6 +290,7 @@ return {
 			-- Public
 			-- Variables
 			targets = targets,
+			properties = properties,
 			reverses = parsedInfo.reverses,
 			repeatCount = parsedInfo.repeatCount,
 			duration = parsedInfo.duration,
@@ -300,6 +308,7 @@ return {
 
 			-- Private
 			-- Variables
+			_info = parsedInfo,
 			_startTime = 0,
 			_elapsedTime = 0,
 			_repeated = 0,

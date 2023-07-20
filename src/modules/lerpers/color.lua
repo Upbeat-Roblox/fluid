@@ -1,7 +1,6 @@
 --[[
 	@title lerpers/color
 	@author Lanred, Validark
-	@version 1.0.0
 ]]
 
 -- Lerps a color.

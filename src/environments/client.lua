@@ -1,7 +1,6 @@
 --[[
 	@title environments/client
 	@author Lanred
-	@version 1.0.0
 ]]
 
 local types = require(script.Parent.Parent.types)
@@ -13,6 +12,31 @@ local easings = require(script.Parent.Parent.modules.easings)
 local tweenEvent: RemoteEvent = script.Parent.Parent.events.tween
 local easingEvent: RemoteEvent = script.Parent.Parent.events.easing
 local requestEvent: RemoteEvent = script.Parent.Parent.events.request
+
+type normalProperties = {
+	start: { [Instance]: types.properties },
+	target: { [Instance]: types.properties },
+}
+
+-- Converts a event safe properties back to normal.
+-- @param {eventSafeProperties} eventSafeProperties [The event safe properties to convert.]
+-- @returns normalProperties
+local function convertEventSafePropertiesToNormal(
+	targets: types.targets,
+	eventSafeProperties: types.eventSafeProperties
+): normalProperties
+	local properties: normalProperties = {
+		start = {},
+		target = {},
+	}
+
+	for index: number, target: Instance in ipairs(targets) do
+		properties.start[target] = eventSafeProperties.start[index]
+		properties.target[target] = eventSafeProperties.target[index]
+	end
+
+	return properties
+end
 
 --[[
 	This is the client environment. It handles all requests from the client
@@ -71,8 +95,8 @@ function client._tweenSingle(event: types.tweenEvents, data)
 		client:create(unpack(data))
 	elseif event == "createOnJoin" then
 		local self = client:create(unpack(data.data))
-		self._properties.start = data.properties.start
-		self._properties.target = data.properties.target
+		local normalProperties: normalProperties = convertEventSafePropertiesToNormal(self.targets, data.properties)
+		self:_recalculateProperties(normalProperties.start, normalProperties.target)
 		self._startTime = data.startTime
 		self._elapsedTime = data.elapsedTime
 

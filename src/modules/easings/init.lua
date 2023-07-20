@@ -1,7 +1,6 @@
 --[[
 	@title easings
 	@author Lanred
-	@version 1.0.0
 ]]
 
 local easings = require(script.easings)
