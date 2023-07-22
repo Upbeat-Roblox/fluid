@@ -1,0 +1,21 @@
+<h1 class="fluid-api-header">
+<div class="fluid-header-icon">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="36" height="36"><path d="M12 1L21.5 6.5V17.5L12 23L2.5 17.5V6.5L12 1ZM6.49896 9.97089L11 12.5768V17.6252H13V12.5768L17.501 9.9709L16.499 8.24005L12 10.8447L7.50104 8.24004L6.49896 9.97089Z" fill="rgba(255,255,255,1)"></path></svg>
+</div>
+
+<span class="fluid-header-title">serverTween</span>
+</h1>
+
+Represents a tween object created by the server. This is not the same as the normal tween class!
+This is a wrapper around server-client communication and allows the server to act as if it is tweening.
+When in reality the clients are going to be tweening using the tween class.
+
+```lua
+(targets: tweenTargets, info: serverTweenInfo, properties: properties) -> serverTween
+```
+
+<hr>
+
+## Methods
+
+

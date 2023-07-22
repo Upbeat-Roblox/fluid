@@ -54,9 +54,9 @@ local server = {}
 server._tweens = {}
 
 -- Starts the event listeners.
--- @private
+-- @public
 -- @returns never
-function server:_start()
+function server:start()
 	requestEvent.OnServerEvent:Connect(function(player: Player)
 		tweenEvent:FireClient(player, true, "createOnJoin", server._tweens)
 		easingEvent:FireClient(player, true, easings.easings)

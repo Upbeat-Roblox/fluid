@@ -35,5 +35,4 @@ else
 end
 
 environment.easings = easings
-environment:_start()
 return environment

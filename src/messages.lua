@@ -27,7 +27,7 @@ return {
 		propertyParameterDurationToSmall = "A '%s' second duration is smaller than the tween duration '%s'.",
 		valueParameterIsAFunction = "The value argument for the expanded property parameters cannot be a 'function' type.",
 		modelPropertiesAreNotTheSame = "Due to current limitations all BaseParts must have the same starting values to tween a model.",
-		invalidModelProperties = "The '%s' property is not a tweenable property. Valid tweenable model properties are 'Position', 'CFrame', 'Color', and 'Transparency'.",
+		invalidModelProperties = "The '%s' property is not a tweenable property.",
 		noValidModelBaseParts = "The model, '%s', does not have any BaseParts to tween.",
 		invalidTargetDataType = "'%s' and '%s' are not matching data types. If you wish to have a start and end value for a goal value then confirm that both values are of the same type.",
 		updateStepsOnClient = "The 'updateSteps' argument is only valid on the server.",

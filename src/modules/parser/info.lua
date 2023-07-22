@@ -44,7 +44,7 @@ return function(info: types.normalTweenInfo | types.serverTweenInfo)
 	}
 
 	-- Confirm that it is a valid easing.
-	if easings.easings[info.easing] == nil then
+	if easings.easings[parsedInfo.easing] == nil then
 		error(messages.parser.invalidEasing:format(parsedInfo.easing), 0)
 	end
 

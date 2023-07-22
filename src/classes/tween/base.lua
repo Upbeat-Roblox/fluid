@@ -11,6 +11,7 @@ local GoodSignal = require(script.Parent.Parent.GoodSignal)
 local updateProperty = require(script.Parent.Parent.Parent.modules.updateProperty)
 local parser = require(script.Parent.Parent.Parent.modules.parser)
 local easings = require(script.Parent.Parent.Parent.modules.easings)
+local getTableType = require(script.Parent.Parent.Parent.modules.getTableType)
 
 -- Destroys a signal.
 -- @param {any} signal [The signal to destroy.]
@@ -22,7 +23,7 @@ local function destroySignal(signal)
 end
 
 --[[
-	An extendable class that has methods used by all variations of the `tween` class.
+	An extendable class that contains shared methods used by all variations of the `tween` class.
 
 	@class
 	@private
@@ -77,7 +78,7 @@ function class:stop()
 	end
 end
 
--- Scrub through the tween.
+-- Scrubs through the tween.
 -- @public
 -- @param {number} position [The position of the tween to move to.]
 -- @returns never
@@ -162,13 +163,13 @@ function class:_complete()
 	self:_updateState(Enum.PlaybackState.Completed)
 	self.completed:Fire()
 
-	if self.destroyOnComplete == true then
-		self:destroy()
-	end
-
 	-- Fire the extension function, if there is one.
 	if self._completeExtension ~= nil then
 		self:_completeExtension()
+	end
+
+	if self.destroyOnComplete == true then
+		self:destroy()
 	end
 end
 
@@ -178,28 +179,13 @@ end
 -- @param {number?} delta [The delta to use when calculating the values for the tween.]
 -- @returns never
 function class:_update(delta: number?)
-	-- This variable is used to make sure that the tween still has valid targets.
-	-- If it does not then its wasting processing power and needs to be stopped.
-	local targetCount: number = 0
-
 	for index: number, target: types.targets in pairs(self.targets) do
-		-- The only way to check if its still a valid target is if its a `Instance`.
-		if typeof(target) == "Instance" and target.Parent == nil then
-			table.remove(self.targets, index)
-			continue
-		end
-
-		targetCount += 1
 		self:_updatePropertiesOnInstance(target, delta)
-	end
-
-	if targetCount <= 0 then
-		self:stop()
 	end
 
 	if self._elapsedTime >= self.duration then
 		self._repeated += 1
-		
+
 		if self._repeated < self.repeatCount then
 			if self.reverses == true then
 				self:_reverse()
@@ -253,7 +239,10 @@ end
 -- @param {{ [types.targets]: types.properties }} starting [The starting properties to use.]
 -- @param {{ [types.targets]: types.properties }} target [The target properties to use.]
 -- @returns never
-function class:_recalculateProperties(starting: { [types.targets]: types.properties }, target: { [types.targets]: types.properties })
+function class:_recalculateProperties(
+	starting: { [types.targets]: types.properties },
+	target: { [types.targets]: types.properties }
+)
 	self._properties = parser.properties(self.targets, self.properties, self._info, starting, target)
 end
 
@@ -282,7 +271,7 @@ return {
 		-- Converting the targets to an array reduces project and file size.
 		-- The reason being it prevents update functions from having to check if the targets
 		-- is a Instance or array / dictionary.
-		if typeof(targets) == "Instance" then
+		if typeof(targets) == "Instance" or getTableType(targets) == "Dictionary" then
 			targets = { targets }
 		end
 

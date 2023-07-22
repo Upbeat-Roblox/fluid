@@ -51,9 +51,9 @@ local client = {}
 client._tweens = {}
 
 -- Starts the event listeners.
--- @private
+-- @public
 -- @returns never
-function client._start()
+function client.start()
 	-- Request the tweens and easings from the server.
 	requestEvent:FireServer()
 

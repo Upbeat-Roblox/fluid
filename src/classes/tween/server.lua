@@ -42,7 +42,7 @@ local function checkTargetsType(targets: types.tweenTargets): "instance" | "nonI
 end
 
 --[[
-	Represents a tween object created by the server. This is not the same as the tween class!
+	Represents a tween object created by the server. This is not the same as the normal tween class!
 	This is a wrapper around server-client communication and allows the server to act as if it is tweening.
 	When in reality the clients are going to be tweening using the tween class.
 

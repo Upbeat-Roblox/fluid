@@ -6,7 +6,7 @@
 
 !!! info "A quick note..."
     
-    Fluid draws inspiration from BoatTween, a key influence in its development. BoatTween has provided Fluid with essential lerping functions, making it possible for Fluid to exist. We express our heartfelt appreciation to the developers of BoatTween for their valuable contribution. If you're looking for a simpler option, we suggest giving BoatTween a try. You can find it here.
+    Fluid draws inspiration from BoatTween, a key influence in its development. BoatTween has provided Fluid with essential lerping functions, making it possible for Fluid to exist. We express our heartfelt appreciation to the developers of BoatTween for their valuable contribution. If you're looking for a simpler option or another alternative, we suggest giving BoatTween a try. You can find it [here](https://devforum.roblox.com/t/boattween-module/540277).
 
 <hr>
 
@@ -29,7 +29,7 @@ To get started with Fluid, you have multiple options for installation:
 You can download Fluid directly as a Roblox model from the Roblox Library. Simply search for "Fluid" in the Roblox Library, find the latest version, and insert it into your project.
 
 ### GitHub Releases
-Fluid is also available for download from GitHub Releases. Visit the [Fluid repository](https://github.com/Lanred-Dev/Fluid) on GitHub, navigate to the ["Releases" section](https://github.com/Lanred-Dev/Fluid/releases), and choose the latest release. Then download the fluid.rbxm file.
+Fluid is also available for download from GitHub Releases. Visit the [Fluid repository](https://github.com/Lanred-Dev/Fluid) on GitHub, navigate to the ["Releases" section](https://github.com/Lanred-Dev/Fluid/releases), and choose the latest release. Then download the `fluid.rbxm` file.
 
 ### Wally Packge
 If you prefer using package managers, you can install Fluid using Wally, a package manager designed specifically for Roblox. Follow these steps to install Fluid via Wally:
