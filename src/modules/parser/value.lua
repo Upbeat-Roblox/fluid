@@ -28,8 +28,7 @@ local function getPropertyValueFromModel(model: Model, property: string): types.
 			-- In reality having all `BaseParts` not be the same
 			-- will not affect the tween but there would be no way
 			-- for the parser to get a certain starting value.
-			-- TODO: Find ways to improve this so that not all
-			-- `BaseParts` have to have the same value.
+			-- TODO: Find ways to improve this so that not all `BaseParts` have to have the same value.
 			if propertyValue == nil then
 				propertyValue = value
 			elseif value ~= propertyValue then
